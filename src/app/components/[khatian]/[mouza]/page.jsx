@@ -13,12 +13,13 @@ import { useParams } from 'next/navigation'
 
 const Page = () => {
     const { khatian, mouza } = useParams();
-    const [input, setInput] = useState('');
-    const [debouncedInput, setDebouncedInput] = useState('');
+    const [ownerInput, setOwnerInput] = useState('');
+    const [khatianInput, setKhatianInput] = useState('');
+    const [debouncedOwner, setDebouncedOwner] = useState('');
+    const [debouncedKhatian, setDebouncedKhatian] = useState('');
     const [loading, setLoading] = useState(true);
 
     const mouzaName = mouza === 'kupot' ? 'কুপট' : 'তালবাড়িয়া';
-
     const khatianName =
         khatian === 'cs'
             ? 'সি,এস'
@@ -27,7 +28,6 @@ const Page = () => {
                 : khatian === 'sa'
                     ? 'এস,এ'
                     : '';
-
 
     const dataMap = {
         cs: {
@@ -44,7 +44,7 @@ const Page = () => {
         },
     };
 
-    let mainData =
+    const mainData =
         dataMap[khatian]?.[mouza] || {
             success: true,
             status_code: 200,
@@ -61,74 +61,77 @@ const Page = () => {
             },
         };
 
-    // Debounce System
-
+    // Loading animation on page load
     useEffect(() => {
-        setInterval(() => {
-            setLoading(false);
-        }, 500);
+        const timer = setTimeout(() => setLoading(false), 500);
+        return () => clearTimeout(timer);
     }, []);
 
+    // Debounce inputs
     useEffect(() => {
         setLoading(true);
         const handler = setTimeout(() => {
-            setDebouncedInput(input);
+            setDebouncedOwner(ownerInput);
+            setDebouncedKhatian(khatianInput);
             setLoading(false);
-        }, 500); // 500ms delay
+        }, 500);
 
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [input]);
+        return () => clearTimeout(handler);
+    }, [ownerInput, khatianInput]);
 
-    // Filter Data
-    const results = mainData.data.items.filter(item =>
-        item.OWNERS && item.OWNERS.includes(debouncedInput)
-    );
+    // Filter data by owner and khatian
+    const results = mainData.data.items.filter(item => {
+        const ownerMatch = item.OWNERS?.includes(debouncedOwner);
+        const khatianMatch = item.KHATIAN_NO?.includes(debouncedKhatian);
+        return ownerMatch && khatianMatch;
+    });
 
-
-
-    const displayItems = debouncedInput ? results : mainData.data.items;
+    const displayItems = debouncedOwner || debouncedKhatian ? results : mainData.data.items;
 
     const engToBanDigits = (str) => {
         const engToBanMap = {
-            "0": "০",
-            "1": "১",
-            "2": "২",
-            "3": "৩",
-            "4": "৪",
-            "5": "৫",
-            "6": "৬",
-            "7": "৭",
-            "8": "৮",
-            "9": "৯",
+            "0": "০", "1": "১", "2": "২", "3": "৩",
+            "4": "৪", "5": "৫", "6": "৬", "7": "৭",
+            "8": "৮", "9": "৯",
         };
         return String(str).replace(/[0-9]/g, (d) => engToBanMap[d]);
     };
 
-
     return (
         <div className="min-h-screen w-full bg-gray-100 flex flex-col items-center sm:p-6 p-4">
-            {/* হেডার */}
+            {/* Header */}
             <header className="w-full bg-blue-900 p-6 shadow-lg">
                 <h1 className="text-white text-3xl font-extrabold text-center">ডিজিটাল খতিয়ান অনুসন্ধান</h1>
                 <p className="text-blue-200 text-center mt-1 text-lg">বাংলাদেশ সরকারের ভূমি রেকর্ডের মতো</p>
             </header>
 
-            {/* সার্চ কার্ড */}
+            {/* Search Card */}
             <div className="mt-10 w-full bg-white sm:p-8 p-4 rounded-2xl shadow-xl max-w-6xl">
                 <h2 className="text-2xl font-bold mb-6 text-gray-700 text-center">
                     {mouzaName} মৌজার ({khatianName}) খতিয়ান খুঁজুন 🔍
                 </h2>
-                <input
-                    type="text"
-                    placeholder="OWNER এর নাম লিখুন..."
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    className="w-full border border-gray-300 rounded-xl p-4 mb-6 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
-                />
 
-                {/* লোডিং সিস্টেম */}
+                {/* Two Inputs in one line */}
+                <div className="flex flex-col md:flex-row gap-4 mb-6">
+                    {/* Owner Input */}
+                    <input
+                        type="text"
+                        placeholder="মালিকের নাম লিখুন..."
+                        value={ownerInput}
+                        onChange={(e) => setOwnerInput(e.target.value)}
+                        className="flex-1 border border-gray-300 rounded-xl p-4 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
+                    />
+                    {/* Khatian Number Input */}
+                    <input
+                        type="text"
+                        placeholder="খতিয়ান নম্বর লিখুন..."
+                        value={khatianInput}
+                        onChange={(e) => setKhatianInput(e.target.value)}
+                        className="flex-1 border border-gray-300 rounded-xl p-4 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
+                    />
+                </div>
+
+                {/* Loading */}
                 {loading ? (
                     <div className="flex justify-center py-12">
                         <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -136,7 +139,7 @@ const Page = () => {
                 ) : (
                     <div className="w-full flex flex-col gap-y-8 items-center justify-center">
                         {displayItems.length > 0 ? (
-                            displayItems.map((item) => (
+                            displayItems.map(item => (
                                 <div
                                     key={item.ID}
                                     className="sm:w-10/12 w-full border rounded-lg p-5 shadow hover:shadow-xl transition duration-300 bg-gradient-to-r from-white via-blue-50 to-white break-words"
@@ -162,16 +165,15 @@ const Page = () => {
                                     <p><strong>ভার্সন নম্বর:</strong> {item.VERSION_NO ? engToBanDigits(item.VERSION_NO) : 'N/A'}</p>
                                     <p><strong>সর্বশেষ:</strong> {engToBanDigits(item.LATEST)}</p>
                                 </div>
-
                             ))
                         ) : (
-                            <p className="text-red-600 text-center font-semibold text-lg">কোন OWNER পাওয়া যায়নি 😔</p>
+                            <p className="text-red-600 text-center font-semibold text-lg">কোন OWNER বা খতিয়ান নম্বর পাওয়া যায়নি 😔</p>
                         )}
                     </div>
                 )}
             </div>
 
-            {/* ফুটার */}
+            {/* Footer */}
             <footer className="mt-12 text-center text-gray-500">
                 © 2025 বাংলাদেশের ডিজিটাল ভূমি রেকর্ড. সকল অধিকার সংরক্ষিত।
             </footer>
