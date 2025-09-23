@@ -26,37 +26,43 @@ const Page = () => {
           খতিয়ান খুঁজুন
         </h2>
 
-        {/* খতিয়ান টাইপ */}
-        <div className="mb-4">
-          <label className="block mb-2 font-medium text-gray-700">
+        <div className="mb-6">
+          <label className="block mb-2 font-semibold text-gray-700 text-lg">
             খতিয়ান প্রকার
           </label>
           <select
+            value={khatianType} // controlled select
             onChange={(e) => setKhatianType(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full p-3 rounded-lg border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200 appearance-none cursor-pointer"
           >
-            <option value="">প্রকার নির্বাচন করুন</option>
-            <option value="cs">CS</option>
-            <option value="rs">RS</option>
-            <option value="sa">SA</option>
-            <option value="brs">BRS</option>
+            <option value="" disabled className="text-gray-400">
+              প্রকার নির্বাচন করুন
+            </option>
+            <option value="cs">সি,এস</option>
+            <option value="rs">আর,এস</option>
+            <option value="sa">এস,এ</option>
+            <option value="brs">বি,আর,এস</option>
           </select>
         </div>
 
         {/* মৌজা সিলেক্ট */}
         <div className="mb-6">
-          <label className="block mb-2 font-medium text-gray-700">
+          <label className="block mb-2 font-semibold text-gray-700 text-lg">
             মৌজা নির্বাচন
           </label>
           <select
+            value={mouza} // controlled select
             onChange={(e) => setMouza(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full p-3 rounded-lg border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200 appearance-none cursor-pointer"
           >
-            <option value="">মৌজা নির্বাচন করুন</option>
+            <option value="" disabled className="text-gray-400">
+              মৌজা নির্বাচন করুন
+            </option>
             <option value="kupot">কুপট</option>
             <option value="talbariya">তালবাড়িয়া</option>
           </select>
         </div>
+
 
         {/* লিংক */}
         {khatianType && mouza && (
@@ -71,7 +77,7 @@ const Page = () => {
 
       {/* ক্রিয়েটর কার্ড */}
       <div className="mt-8 bg-gray-200/80 w-full max-w-md text-center p-3 rounded-lg shadow-inner text-gray-700 text-sm font-medium">
-        ওয়েবসাইটটি তৈরি করেছেন: <strong>আব্দুল আলিম</strong>, <br/> পিতাঃ <strong>আব্দুল জলিল গাজী</strong>
+        ওয়েবসাইটটি তৈরি করেছেন: <strong>আব্দুল আলিম</strong>, <br /> পিতাঃ <strong>আব্দুল জলিল গাজী</strong>
       </div>
 
       {/* ফুটার */}

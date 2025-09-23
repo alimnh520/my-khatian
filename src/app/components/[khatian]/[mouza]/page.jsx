@@ -108,28 +108,30 @@ const Page = () => {
 
 
     return (
-        <div className="min-h-screen w-full bg-gray-100 flex flex-col items-center p-6">
+        <div className="min-h-screen w-full bg-gray-100 flex flex-col items-center sm:p-6 p-4">
             {/* হেডার */}
-            <header className="w-full bg-blue-800 p-6 shadow-md">
-                <h1 className="text-white text-3xl font-bold text-center">ডিজিটাল খতিয়ান অনুসন্ধান</h1>
-                <p className="text-blue-200 text-center mt-1">বাংলাদেশ সরকারের ভূমি রেকর্ডের মতো</p>
+            <header className="w-full bg-blue-900 p-6 shadow-lg">
+                <h1 className="text-white text-3xl font-extrabold text-center">ডিজিটাল খতিয়ান অনুসন্ধান</h1>
+                <p className="text-blue-200 text-center mt-1 text-lg">বাংলাদেশ সরকারের ভূমি রেকর্ডের মতো</p>
             </header>
 
             {/* সার্চ কার্ড */}
-            <div className="mt-10 w-full bg-white p-8 rounded-xl shadow-lg">
-                <h2 className="text-2xl font-semibold mb-6 text-gray-700 text-center">{mouzaName} এর ({khatianName}) খতিয়ান খুঁজুন 🔍</h2>
+            <div className="mt-10 w-full bg-white sm:p-8 p-4 rounded-2xl shadow-xl max-w-6xl">
+                <h2 className="text-2xl font-bold mb-6 text-gray-700 text-center">
+                    {mouzaName} মৌজার ({khatianName}) খতিয়ান খুঁজুন 🔍
+                </h2>
                 <input
                     type="text"
                     placeholder="OWNER এর নাম লিখুন..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg p-3 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="w-full border border-gray-300 rounded-xl p-4 mb-6 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
                 />
 
                 {/* লোডিং সিস্টেম */}
                 {loading ? (
-                    <div className="flex justify-center py-10">
-                        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="flex justify-center py-12">
+                        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 ) : (
                     <div className="w-full flex flex-col gap-y-8 items-center justify-center">
@@ -137,7 +139,7 @@ const Page = () => {
                             displayItems.map((item) => (
                                 <div
                                     key={item.ID}
-                                    className="w-10/12 border rounded-lg p-5 shadow hover:shadow-xl transition duration-300 bg-gradient-to-r from-white via-blue-50 to-white break-words"
+                                    className="sm:w-10/12 w-full border rounded-lg p-5 shadow hover:shadow-xl transition duration-300 bg-gradient-to-r from-white via-blue-50 to-white break-words"
                                 >
                                     <p><strong>আইডি:</strong> {engToBanDigits(item.ID)}</p>
                                     <p><strong>JL নম্বর আইডি:</strong> {engToBanDigits(item.JL_NUMBER_ID)}</p>
