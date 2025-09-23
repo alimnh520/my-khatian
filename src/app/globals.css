@@ -10,6 +10,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-noto: var(--font-noto-bengali);
+  --font-rubic: var(--font-rubic);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +21,37 @@
   }
 }
 
+@font-face {
+  font-family: "Bornomala";
+  src: url("/fonts/Bornomala-Regular.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Bornomala", sans-serif;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #3b82f6 #e5e7eb;
+}
+
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  display: block;
+  width: 8px; /* scrollbar পুরুত্ব */
+}
+
+::-webkit-scrollbar-track {
+  background: #e5e7eb; /* track color (light gray) */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #3b82f6; /* thumb color (blue) */
+  border-radius: 4px;
+  border: 2px solid #e5e7eb; /* thumb border */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #2563eb; /* hover এ dark blue */
 }
