@@ -5,6 +5,7 @@ import CsKupot from '@/app/components/data/cs/kupot.json'
 
 import RsTalbariya from '@/app/components/data/rs/talbariya.json'
 import RsKupot from '@/app/components/data/rs/kupot.json'
+import RsBiralokkhi from '@/app/components/data/rs/biralokkhi.json'
 
 import SaTalbariya from '@/app/components/data/sa/talbariya.json'
 import SaKupot from '@/app/components/data/sa/kupot.json'
@@ -21,7 +22,12 @@ const Page = () => {
     const [debouncedGuardian, setDebouncedGuardian] = useState('');
     const [loading, setLoading] = useState(true);
 
-    const mouzaName = mouza === 'kupot' ? 'কুপট' : 'তালবাড়িয়া';
+    const mouzaName = mouza === 'kupot'
+        ? 'কুপট'
+        : mouza === 'talbariya'
+            ? 'তালবাড়িয়া'
+            : 'বিড়ালক্ষী';
+
     const khatianName =
         khatian === 'cs'
             ? 'সি,এস'
@@ -39,6 +45,7 @@ const Page = () => {
         rs: {
             talbariya: RsTalbariya,
             kupot: RsKupot,
+            biralokkhi: RsBiralokkhi
         },
         sa: {
             talbariya: SaTalbariya,
