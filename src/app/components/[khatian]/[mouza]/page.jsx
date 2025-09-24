@@ -15,8 +15,10 @@ const Page = () => {
     const { khatian, mouza } = useParams();
     const [ownerInput, setOwnerInput] = useState('');
     const [khatianInput, setKhatianInput] = useState('');
+    const [guardianInput, setGuardianInput] = useState('');
     const [debouncedOwner, setDebouncedOwner] = useState('');
     const [debouncedKhatian, setDebouncedKhatian] = useState('');
+    const [debouncedGuardian, setDebouncedGuardian] = useState('');
     const [loading, setLoading] = useState(true);
 
     const mouzaName = mouza === 'kupot' ? 'কুপট' : 'তালবাড়িয়া';
@@ -61,6 +63,26 @@ const Page = () => {
             },
         };
 
+    // English → Bangla digits
+    const engToBanDigits = (str) => {
+        const engToBanMap = {
+            "0": "০", "1": "১", "2": "২", "3": "৩",
+            "4": "৪", "5": "৫", "6": "৬", "7": "৭",
+            "8": "৮", "9": "৯",
+        };
+        return String(str).replace(/[0-9]/g, (d) => engToBanMap[d]);
+    };
+
+    // Bangla → English digits
+    const banToEngDigits = (str) => {
+        const banToEngMap = {
+            "০": "0", "১": "1", "২": "2", "৩": "3",
+            "৪": "4", "৫": "5", "৬": "6", "৭": "7",
+            "৮": "8", "৯": "9",
+        };
+        return String(str).replace(/[০-৯]/g, (d) => banToEngMap[d]);
+    };
+
     // Loading animation on page load
     useEffect(() => {
         const timer = setTimeout(() => setLoading(false), 500);
@@ -72,30 +94,23 @@ const Page = () => {
         setLoading(true);
         const handler = setTimeout(() => {
             setDebouncedOwner(ownerInput);
-            setDebouncedKhatian(khatianInput);
+            setDebouncedKhatian(banToEngDigits(khatianInput)); // ইংরেজিতে কনভার্ট করে সার্চ হবে
+            setDebouncedGuardian(guardianInput);
             setLoading(false);
         }, 500);
 
         return () => clearTimeout(handler);
-    }, [ownerInput, khatianInput]);
+    }, [ownerInput, khatianInput, guardianInput]);
 
-    // Filter data by owner and khatian
+    // Filter data by owner, khatian and guardian
     const results = mainData.data.items.filter(item => {
         const ownerMatch = item.OWNERS?.includes(debouncedOwner);
         const khatianMatch = item.KHATIAN_NO?.includes(debouncedKhatian);
-        return ownerMatch && khatianMatch;
+        const guardianMatch = item.GUARDIANS?.includes(debouncedGuardian);
+        return ownerMatch && khatianMatch && guardianMatch;
     });
 
-    const displayItems = debouncedOwner || debouncedKhatian ? results : mainData.data.items;
-
-    const engToBanDigits = (str) => {
-        const engToBanMap = {
-            "0": "০", "1": "১", "2": "২", "3": "৩",
-            "4": "৪", "5": "৫", "6": "৬", "7": "৭",
-            "8": "৮", "9": "৯",
-        };
-        return String(str).replace(/[0-9]/g, (d) => engToBanMap[d]);
-    };
+    const displayItems = (debouncedOwner || debouncedKhatian || debouncedGuardian) ? results : mainData.data.items;
 
     return (
         <div className="min-h-screen w-full bg-gray-100 flex flex-col items-center sm:p-6 p-4">
@@ -111,9 +126,8 @@ const Page = () => {
                     {mouzaName} মৌজার ({khatianName}) খতিয়ান খুঁজুন 🔍
                 </h2>
 
-                {/* Two Inputs in one line */}
+                {/* Inputs in one line */}
                 <div className="flex flex-col md:flex-row gap-4 mb-6">
-                    {/* Owner Input */}
                     <input
                         type="text"
                         placeholder="মালিকের নাম লিখুন..."
@@ -121,12 +135,18 @@ const Page = () => {
                         onChange={(e) => setOwnerInput(e.target.value)}
                         className="flex-1 border border-gray-300 rounded-xl p-4 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
                     />
-                    {/* Khatian Number Input */}
+                    <input
+                        type="text"
+                        placeholder="অভিভাবকের নাম লিখুন..."
+                        value={guardianInput}
+                        onChange={(e) => setGuardianInput(e.target.value)}
+                        className="flex-1 border border-gray-300 rounded-xl p-4 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
+                    />
                     <input
                         type="text"
                         placeholder="খতিয়ান নম্বর লিখুন..."
-                        value={khatianInput}
-                        onChange={(e) => setKhatianInput(e.target.value)}
+                        value={engToBanDigits(khatianInput)} // ইনপুটে বাংলায় দেখাবে
+                        onChange={(e) => setKhatianInput(banToEngDigits(e.target.value))} // ভিতরে ইংরেজিতে রাখবে
                         className="flex-1 border border-gray-300 rounded-xl p-4 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
                     />
                 </div>
@@ -167,7 +187,7 @@ const Page = () => {
                                 </div>
                             ))
                         ) : (
-                            <p className="text-red-600 text-center font-semibold text-lg">কোন OWNER বা খতিয়ান নম্বর পাওয়া যায়নি 😔</p>
+                            <p className="text-red-600 text-center font-semibold text-lg">কোন OWNER, খতিয়ান নম্বর বা অভিভাবক পাওয়া যায়নি 😔</p>
                         )}
                     </div>
                 )}
