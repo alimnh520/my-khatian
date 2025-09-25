@@ -1,14 +1,18 @@
 'use client'
 import React, { useState, useEffect } from 'react'
+
 import CsTalbariya from '@/app/components/data/cs/talbariya.json'
 import CsKupot from '@/app/components/data/cs/kupot.json'
+import CsWestBiralokkhi from '@/app/components/data/cs/westbiralokkhi.json'
 
 import RsTalbariya from '@/app/components/data/rs/talbariya.json'
 import RsKupot from '@/app/components/data/rs/kupot.json'
-import RsBiralokkhi from '@/app/components/data/rs/biralokkhi.json'
+import RsEastBiralokkhi from '@/app/components/data/rs/eastbiralokkhi.json'
+import RsWestBiralokkhi from '@/app/components/data/rs/westbiralokkhi.json'
 
 import SaTalbariya from '@/app/components/data/sa/talbariya.json'
 import SaKupot from '@/app/components/data/sa/kupot.json'
+import SaWestBiralokkhi from '@/app/components/data/sa/westbiralokkhi.json'
 
 import { useParams } from 'next/navigation'
 
@@ -22,11 +26,15 @@ const Page = () => {
     const [debouncedGuardian, setDebouncedGuardian] = useState('');
     const [loading, setLoading] = useState(true);
 
-    const mouzaName = mouza === 'kupot'
-        ? 'কুপট'
-        : mouza === 'talbariya'
-            ? 'তালবাড়িয়া'
-            : 'বিড়ালক্ষী';
+    const mouzaMap = {
+        kupot: "কুপট",
+        talbariya: "তালবাড়িয়া",
+        eastbiralokkhi: "পূর্ব বিড়ালক্ষী",
+        westbiralokkhi: "পশ্চিম বিড়ালক্ষী"
+    };
+
+    const mouzaName = mouzaMap[mouza] || "অজানা মৌজা";
+
 
     const khatianName =
         khatian === 'cs'
@@ -41,15 +49,18 @@ const Page = () => {
         cs: {
             talbariya: CsTalbariya,
             kupot: CsKupot,
+            westbiralokkhi: CsWestBiralokkhi
         },
         rs: {
             talbariya: RsTalbariya,
             kupot: RsKupot,
-            biralokkhi: RsBiralokkhi
+            eastbiralokkhi: RsEastBiralokkhi,
+            westbiralokkhi: RsWestBiralokkhi
         },
         sa: {
             talbariya: SaTalbariya,
             kupot: SaKupot,
+            westbiralokkhi: SaWestBiralokkhi
         },
     };
 

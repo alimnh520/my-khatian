@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "status_code": 200,
+  "message": "Retrieved Successfully",
+  "data": {
+    "items": [],
+    "meta": {
+      "totalItems": 0,
+      "itemCount": 0,
+      "itemsPerPage": 100,
+      "totalPages": 0,
+      "currentPage": 1
+    }
+  }
+}

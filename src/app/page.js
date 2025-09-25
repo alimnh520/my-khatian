@@ -60,7 +60,8 @@ const Page = () => {
             </option>
             <option value="kupot">কুপট</option>
             <option value="talbariya">তালবাড়িয়া</option>
-            <option value="biralokkhi">পূর্ব বিড়ালক্ষিী</option>
+            <option value="eastbiralokkhi">পূর্ব বিড়ালক্ষিী</option>
+            <option value="westbiralokkhi">পশ্চিম বিড়ালক্ষিী</option>
           </select>
         </div>
 
