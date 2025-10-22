@@ -21,9 +21,13 @@ const Page = () => {
     const [ownerInput, setOwnerInput] = useState('');
     const [khatianInput, setKhatianInput] = useState('');
     const [guardianInput, setGuardianInput] = useState('');
+    const [dagInput, setDagInput] = useState(''); // ✅ নতুন স্টেট দাগ নম্বরের জন্য
+
     const [debouncedOwner, setDebouncedOwner] = useState('');
     const [debouncedKhatian, setDebouncedKhatian] = useState('');
     const [debouncedGuardian, setDebouncedGuardian] = useState('');
+    const [debouncedDag, setDebouncedDag] = useState(''); // ✅ নতুন
+
     const [loading, setLoading] = useState(true);
 
     const mouzaMap = {
@@ -34,7 +38,6 @@ const Page = () => {
     };
 
     const mouzaName = mouzaMap[mouza] || "অজানা মৌজা";
-
 
     const khatianName =
         khatian === 'cs'
@@ -101,34 +104,38 @@ const Page = () => {
         return String(str).replace(/[০-৯]/g, (d) => banToEngMap[d]);
     };
 
-    // Loading animation on page load
+    // Loading animation
     useEffect(() => {
         const timer = setTimeout(() => setLoading(false), 500);
         return () => clearTimeout(timer);
     }, []);
 
-    // Debounce inputs
+    // Debounce all inputs
     useEffect(() => {
         setLoading(true);
         const handler = setTimeout(() => {
             setDebouncedOwner(ownerInput);
-            setDebouncedKhatian(banToEngDigits(khatianInput)); // ইংরেজিতে কনভার্ট করে সার্চ হবে
+            setDebouncedKhatian(banToEngDigits(khatianInput));
             setDebouncedGuardian(guardianInput);
+            setDebouncedDag(banToEngDigits(dagInput)); // ✅ নতুন
             setLoading(false);
         }, 500);
 
         return () => clearTimeout(handler);
-    }, [ownerInput, khatianInput, guardianInput]);
+    }, [ownerInput, khatianInput, guardianInput, dagInput]);
 
-    // Filter data by owner, khatian and guardian
+    // ✅ এখন দাগ দিয়েও ফিল্টার হবে
     const results = mainData.data.items.filter(item => {
-        const ownerMatch = item.OWNERS?.includes(debouncedOwner);
-        const khatianMatch = item.KHATIAN_NO?.includes(debouncedKhatian);
-        const guardianMatch = item.GUARDIANS?.includes(debouncedGuardian);
-        return ownerMatch && khatianMatch && guardianMatch;
+        const ownerMatch = debouncedOwner ? item.OWNERS?.includes(debouncedOwner) : true;
+        const khatianMatch = debouncedKhatian ? item.KHATIAN_NO?.includes(debouncedKhatian) : true;
+        const guardianMatch = debouncedGuardian ? item.GUARDIANS?.includes(debouncedGuardian) : true;
+        const dagMatch = debouncedDag ? item.DAGS?.includes(debouncedDag) : true;
+        return ownerMatch && khatianMatch && guardianMatch && dagMatch;
     });
 
-    const displayItems = (debouncedOwner || debouncedKhatian || debouncedGuardian) ? results : mainData.data.items;
+    const displayItems = (debouncedOwner || debouncedKhatian || debouncedGuardian || debouncedDag)
+        ? results
+        : mainData.data.items;
 
     return (
         <div className="min-h-screen w-full bg-gray-100 flex flex-col items-center sm:p-6 p-4">
@@ -145,7 +152,7 @@ const Page = () => {
                 </h2>
 
                 {/* Inputs in one line */}
-                <div className="flex flex-col md:flex-row gap-4 mb-6">
+                <div className="flex flex-col md:flex-row gap-4 mb-6 flex-wrap justify-center">
                     <input
                         type="text"
                         placeholder="মালিকের নাম লিখুন..."
@@ -163,8 +170,16 @@ const Page = () => {
                     <input
                         type="text"
                         placeholder="খতিয়ান নম্বর লিখুন..."
-                        value={engToBanDigits(khatianInput)} // ইনপুটে বাংলায় দেখাবে
-                        onChange={(e) => setKhatianInput(banToEngDigits(e.target.value))} // ভিতরে ইংরেজিতে রাখবে
+                        value={engToBanDigits(khatianInput)}
+                        onChange={(e) => setKhatianInput(banToEngDigits(e.target.value))}
+                        className="flex-1 border border-gray-300 rounded-xl p-4 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
+                    />
+                    {/* ✅ নতুন ইনপুট: দাগ নম্বর সার্চ */}
+                    <input
+                        type="text"
+                        placeholder="দাগ নম্বর লিখুন..."
+                        value={engToBanDigits(dagInput)}
+                        onChange={(e) => setDagInput(banToEngDigits(e.target.value))}
                         className="flex-1 border border-gray-300 rounded-xl p-4 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
                     />
                 </div>
