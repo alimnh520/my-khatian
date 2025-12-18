@@ -21,12 +21,15 @@ const Page = () => {
     const [ownerInput, setOwnerInput] = useState('');
     const [khatianInput, setKhatianInput] = useState('');
     const [guardianInput, setGuardianInput] = useState('');
-    const [dagInput, setDagInput] = useState(''); // ✅ নতুন স্টেট দাগ নম্বরের জন্য
+    const [dagInput, setDagInput] = useState('');
+    const [landInput, setLandInput] = useState('');
+    const [debouncedLand, setDebouncedLand] = useState('');
+
 
     const [debouncedOwner, setDebouncedOwner] = useState('');
     const [debouncedKhatian, setDebouncedKhatian] = useState('');
     const [debouncedGuardian, setDebouncedGuardian] = useState('');
-    const [debouncedDag, setDebouncedDag] = useState(''); // ✅ নতুন
+    const [debouncedDag, setDebouncedDag] = useState('');
 
     const [loading, setLoading] = useState(true);
 
@@ -117,25 +120,78 @@ const Page = () => {
             setDebouncedOwner(ownerInput);
             setDebouncedKhatian(banToEngDigits(khatianInput));
             setDebouncedGuardian(guardianInput);
-            setDebouncedDag(banToEngDigits(dagInput)); // ✅ নতুন
+            setDebouncedDag(banToEngDigits(dagInput));
+            setDebouncedLand(banToEngDigits(landInput)); // ✅ নতুন
             setLoading(false);
         }, 500);
 
         return () => clearTimeout(handler);
-    }, [ownerInput, khatianInput, guardianInput, dagInput]);
+    }, [ownerInput, khatianInput, guardianInput, dagInput, landInput]);
 
-    // ✅ এখন দাগ দিয়েও ফিল্টার হবে
-    const results = mainData.data.items.filter(item => {
-        const ownerMatch = debouncedOwner ? item.OWNERS?.includes(debouncedOwner) : true;
-        const khatianMatch = debouncedKhatian ? item.KHATIAN_NO?.includes(debouncedKhatian) : true;
-        const guardianMatch = debouncedGuardian ? item.GUARDIANS?.includes(debouncedGuardian) : true;
-        const dagMatch = debouncedDag ? item.DAGS?.includes(debouncedDag) : true;
-        return ownerMatch && khatianMatch && guardianMatch && dagMatch;
-    });
 
-    const displayItems = (debouncedOwner || debouncedKhatian || debouncedGuardian || debouncedDag)
-        ? results
-        : mainData.data.items;
+    const results = mainData.data.items
+        .filter(item => {
+            const ownerMatch = debouncedOwner
+                ? item.OWNERS?.includes(debouncedOwner)
+                : true;
+
+            const khatianMatch = debouncedKhatian
+                ? item.KHATIAN_NO?.includes(debouncedKhatian)
+                : true;
+
+            const guardianMatch = debouncedGuardian
+                ? item.GUARDIANS?.includes(debouncedGuardian)
+                : true;
+
+            const dagMatch = debouncedDag
+                ? item.DAGS?.includes(debouncedDag)
+                : true;
+
+            const landMatch = debouncedLand
+                ? item.TOTAL_LAND?.includes(debouncedLand)
+                : true;
+
+            return (
+                ownerMatch &&
+                khatianMatch &&
+                guardianMatch &&
+                dagMatch &&
+                landMatch
+            );
+        })
+        .sort((a, b) => {
+            if (!debouncedLand) return 0;
+
+            const search = debouncedLand;
+
+            const [aInt, aDec = ""] = a.TOTAL_LAND.split(".");
+            const [bInt, bDec = ""] = b.TOTAL_LAND.split(".");
+
+            const aScore =
+                aInt.includes(search) ? 2 :
+                    aDec.includes(search) ? 1 : 0;
+
+            const bScore =
+                bInt.includes(search) ? 2 :
+                    bDec.includes(search) ? 1 : 0;
+
+            if (aScore !== bScore) {
+                return bScore - aScore;
+            }
+
+            return parseFloat(b.TOTAL_LAND) - parseFloat(a.TOTAL_LAND);
+        });
+
+
+    const displayItems =
+        (debouncedOwner ||
+            debouncedKhatian ||
+            debouncedGuardian ||
+            debouncedDag ||
+            debouncedLand)
+            ? results
+            : mainData.data.items;
+
 
     return (
         <div className="min-h-screen w-full bg-gray-100 flex flex-col items-center sm:p-6 p-4">
@@ -146,13 +202,13 @@ const Page = () => {
             </header>
 
             {/* Search Card */}
-            <div className="mt-10 w-full bg-white sm:p-8 p-4 rounded-2xl shadow-xl max-w-6xl">
+            <div className="mt-10 w-full bg-white sm:p-8 p-4 rounded-2xl shadow-xl md:max-w-10/12">
                 <h2 className="text-2xl font-bold mb-6 text-gray-700 text-center">
                     {mouzaName} মৌজার ({khatianName}) খতিয়ান খুঁজুন 🔍
                 </h2>
 
                 {/* Inputs in one line */}
-                <div className="flex flex-col md:flex-row gap-4 mb-6 flex-wrap justify-center">
+                <div className="flex flex-col md:flex-row gap-3 mb-6 justify-between">
                     <input
                         type="text"
                         placeholder="মালিকের নাম লিখুন..."
@@ -182,6 +238,14 @@ const Page = () => {
                         onChange={(e) => setDagInput(banToEngDigits(e.target.value))}
                         className="flex-1 border border-gray-300 rounded-xl p-4 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
                     />
+                    <input
+                        type="text"
+                        placeholder="মোট জমির পরিমাণ লিখুন (একর)"
+                        value={engToBanDigits(landInput)}
+                        onChange={(e) => setLandInput(banToEngDigits(e.target.value))}
+                        className="flex-1 border border-gray-300 rounded-xl p-4 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
+                    />
+
                 </div>
 
                 {/* Loading */}
